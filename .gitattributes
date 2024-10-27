@@ -1,0 +1,14 @@
+* text=auto
+
+*.asm   text eol=lf diff=assembly
+*.py    text eol=lf diff=python
+*.cpp   text eol=lf diff=cpp
+*.java  text eol=lf diff=java
+*.pdf   binary
+*.txt   text eol=lf
+*.md    text eol=lf diff=markdown
+
+*.jpg    binary
+*.png    binary
+*.gif    binary
+*.zip    binary
