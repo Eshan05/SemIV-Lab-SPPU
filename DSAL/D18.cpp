@@ -1,0 +1,1 @@
+// 18. Given sequence $k = k_1 < k_2 < \dots <k_n$ of $n$ sorted keys, with a search probability $\pi$ for each key $k_i$ . Build the Binary search tree that has the least search cost given the access probability for each key

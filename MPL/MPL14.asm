@@ -1,0 +1,1 @@
+; 14. Write an X86/64 ALP password program that operates as follows: Do not display what is actually typed instead display asterisk (“*”). If the password is correct display, “access is granted” else display “Access not Granted”
