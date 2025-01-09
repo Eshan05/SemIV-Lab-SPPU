@@ -1,0 +1,20 @@
+# Read the README.md file
+$lines = Get-Content -Path "README.md"
+
+# Initialize an array to store descriptions
+$mpl_descriptions = @()
+
+# Extract the problem descriptions based on the numbering
+foreach ($line in $lines) {
+    # Check if the line starts with a number followed by a period (e.g., "1. ")
+    if ($line -match '^\d+\.\s') {
+        $mpl_descriptions += $line.Trim()
+    }
+}
+
+# Create files for each MPL problem
+for ($i = 1; $i -le $mpl_descriptions.Count; $i++) {
+    $filename = "MPL$i.asm"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $mpl_descriptions[$i - 1]
+}

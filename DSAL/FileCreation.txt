@@ -1,0 +1,66 @@
+# Read the README.md file
+$lines = Get-Content -Path "README.md"
+
+# Initialize an array to store descriptions
+$descriptions = @()
+
+# Extract the problem descriptions based on the numbering
+foreach ($line in $lines) {
+    # Check if the line starts with a number followed by a period (e.g., "1. ")
+    if ($line -match '^\d+\.\s') {
+        $descriptions += $line.Trim()
+    }
+}
+
+# Group A (Python)
+for ($i = 1; $i -le 4; $i++) {
+    $filename = "A$i.py"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
+
+# Group B (C++)
+for ($i = 5; $i -le 12; $i++) {
+    $filename = "B$i.cpp"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
+
+# Group C (C++)
+for ($i = 13; $i -le 17; $i++) {
+    $filename = "C$i.cpp"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
+
+# Group D (C++)
+for ($i = 18; $i -le 19; $i++) {
+    $filename = "D$i.cpp"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
+
+# Group E (Java)
+for ($i = 20; $i -le 22; $i++) {
+    $filename = "E$i.java"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
+
+# Group F (Java)
+for ($i = 23; $i -le 26; $i++) {
+    $filename = "F$i.java"
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
+
+# Mini Project / Case Study (Python/Java)
+for ($i = 27; $i -le 30; $i++) {
+    if ($i -eq 28) {
+        $filename = "MiniProject_$i.py"
+    } else {
+        $filename = "MiniProject_$i.java"
+    }
+    New-Item -Path $filename -ItemType File -Force
+    Set-Content -Path $filename -Value $descriptions[$i - 1]
+}
