@@ -70,3 +70,14 @@
 28. Design a mini project to implement Snake and Ladders Game using Python.
 29. Design a mini project to implement a Smart text editor.
 30. Design a mini project for automated Term work assessment of student based on parameters like daily attendance, Unit Test / Prelim performance, Students achievements if any, Mock Practical.
+
+---
+
+What constitutes to a good program:
+1. Should focus on the core problem and efficiently
+2. Pure traditional programming, try to avoid built-in stuff
+3. A program written elegantly whilst showing understanding & knowledge -> Better. Even if it means no use of classes or 'flex-y' / show-off code with unnecessary functions / concepts
+4. It should be extensible, and by extension not just 'solve' that specific problem.
+5. Maintain readability. Should be intuitive. (The logic and structure. Things like comments, variable names and such aren't important)   
+6. Programs SHOULD have a well-formed output with all the features necessary and have a TUI.
+7. Reminder that we are not writing production code but rather learning and academic code.
