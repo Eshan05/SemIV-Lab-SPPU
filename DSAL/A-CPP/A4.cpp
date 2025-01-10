@@ -9,177 +9,305 @@
 //   8. Difference between two sets
 //   9. Subset
 
-#include <algorithm>
 #include <iostream>
-#include <list>
+#include <string>
 using namespace std;
 
-int hFn(int k) { return k % 10; }
-
-class Set {
+class SetIterator {
  private:
-  list<int> d;
+  int *arr;
+  int count;
+  int idx;
 
  public:
-  void add(int v) {
-    auto it = find(d.begin(), d.end(), v);
-    if (it == d.end()) d.push_back(v);
+  SetIterator(int *data, int n) {
+    arr = data;
+    count = n;
+    idx = 0;
   }
 
-  void deleteK(int v) {
-    auto it = find(d.begin(), d.end(), v);
-    if (!(it == d.end())) d.remove(v);
-  }
+  bool hasNext() const { return idx < count; }
 
-  bool contains(int v) const {
-    auto it = find(d.begin(), d.end(), v);
-    return it != d.end();
-  }
-
-  int getSize() { return d.size(); }
-  void display() {
-    cout << "Set: { ";
-    for (int v : d) cout << v << ", ";
-    cout << " }" << endl;
-  }
-
-  list<int>::iterator iterator() { return d.begin(); }
-
-  Set intersection(const Set &other) {
-    Set result;
-    for (auto it = d.begin(); it != d.end(); ++it) {
-      if (other.contains(*it)) {
-        result.add(*it);
-      }
-    }
-    return result;
-  }
-
-  Set unionSet(const Set &other) {
-    Set result = *this;
-    for (auto it = other.d.begin(); it != other.d.end(); ++it) {
-      result.add(*it);
-    }
-    return result;
-  }
-
-  Set difference(const Set &other) {
-    Set result;
-    for (auto it = d.begin(); it != d.end(); ++it) {
-      if (!other.contains(*it)) {
-        result.add(*it);
-      }
-    }
-    return result;
-  }
-
-  bool isSubset(const Set &other) {
-    if (d.size() < other.d.size()) return false;
-    for (auto it = d.begin(); it != d.end(); ++it) {
-      if (!other.contains(*it)) return false;
-    }
-    return true;
+  int next() {
+    if (!hasNext()) return 0;
+    return arr[idx++];
   }
 };
 
-int main() {
-  Set s1, s2;
-  int ch1, ch2, val;
-  do {
-    cout << "\nMenu: " << endl;
-    cout << "1. Set A\n2. Set B\n3. Union of both\n4. Intersection of both\n5. Difference of A with B\n6. Difference of B with A\n7. Is A subset of B\n8. Exit\nEnter your choice: ";
-    cin >> ch1;
-    switch (ch1) {
-      case 1:
-        do {
-          cout << "Set A: " << endl;
-          cout << "1. Add element\n2. Delete element\n3. Find element\n4. Number of elements\n5. Display\n6. Exit\nEnter your choice";
-          cin >> ch2;
-          switch (ch2) {
-            case 1:
-              cout << "Enter element to add: ";
-              cin >> val;
-              s1.add(val);
-              break;
-            case 2:
-              cout << "Enter element to delete: ";
-              cin >> val;
-              s1.deleteK(val);
-              break;
-            case 3:
-              cout << "Enter element to find: ";
-              cin >> val;
-              if (s1.contains(val)) cout << "Element found\n";
-              else cout << "Element not found\n";
-              break;
-            case 4:
-              cout << "Number of elements: " << s1.getSize() << endl;
-              break;
-            case 5:
-              s1.display();
-              break;
-            case 6:
-              cout << "Exiting...\n";
-              break;
-            default:
-              cout << "Invalid choice\n";
-          }
-        } while (ch2 != 6);
-        break;
-      case 2:
-        do {
-          cout << "Set B: " << endl;
-          cout << "1. Add element\n2. Delete element\n3. Find element\n4. Number of elements\n5. Display\n6. Exit\nEnter your choice";
-          cin >> ch2;
-          switch (ch2) {
-            case 1:
-              cout << "Enter element to add: ";
-              cin >> val;
-              s2.add(val);
-              break;
-            case 2:
-              cout << "Enter element to delete: ";
-              cin >> val;
-              s2.deleteK(val);
-              break;
-            case 3:
-              cout << "Enter element to find: ";
-              cin >> val;
-              if (s2.contains(val)) cout << "Element found\n";
-              else cout << "Element not found\n";
-              break;
-            case 4:
-              cout << "Number of elements: " << s2.getSize() << endl;
-              break;
-            case 5:
-              s2.display();
-              break;
-            case 6:
-              cout << "Exiting...\n";
-              break;
-            default:
-              cout << "Invalid choice\n";
-          }
-        } while (ch2 != 6);
-        break;
+class SetADT {
+ private:
+  int *data;
+  int count;
+  int capacity;
 
-      case 3: s1.unionSet(s2).display(); break;
-      case 4: s1.intersection(s2).display(); break;
-      case 5: s1.difference(s2).display(); break;
+  void ensureCapacity() {
+    if (count < capacity) return;
 
-      case 6: s2.difference(s1).display(); break;
-      case 7:
-        if (s1.isSubset(s2)) cout << "A is a subset of B\n";
-        else cout << "A is not a subset of B\n";
-        break;
+    int newCap = capacity * 2;
+    if (newCap < 4) newCap = 4;
 
-      case 8:
-        cout << "Exiting...\n";
-        break;
-
-      default:
-        cout << "Invalid choice\n";
+    int *newData = new int[newCap];
+    for (int i = 0; i < count; ++i) {
+      newData[i] = data[i];
     }
-  } while (ch1 != 8);
+    delete[] data;
+    data = newData;
+    capacity = newCap;
+  }
+
+  int binarySearch(int key) const {
+    int low = 0;
+    int high = count - 1;
+    while (low <= high) {
+      int mid = low + (high - low) / 2;
+      if (data[mid] == key) return mid;
+      if (data[mid] < key) low = mid + 1;
+      else high = mid - 1;
+    }
+    return -1;
+  }
+
+  int findInsertPosition(int key) const {
+    int low = 0;
+    int high = count;
+    while (low < high) {
+      int mid = low + (high - low) / 2;
+      if (data[mid] < key) low = mid + 1;
+      else high = mid;
+    }
+    return low;
+  }
+
+ public:
+  SetADT(int cap = 8) {
+    if (cap < 1) cap = 8;
+    capacity = cap;
+    count = 0;
+    data = new int[capacity];
+  }
+
+  SetADT(const SetADT &other) {
+    capacity = other.capacity;
+    count = other.count;
+    data = new int[capacity];
+    for (int i = 0; i < count; ++i) {
+      data[i] = other.data[i];
+    }
+  }
+
+  SetADT &operator=(const SetADT &other) {
+    if (this == &other) return *this;
+    delete[] data;
+    capacity = other.capacity;
+    count = other.count;
+    data = new int[capacity];
+    for (int i = 0; i < count; ++i) {
+      data[i] = other.data[i];
+    }
+    return *this;
+  }
+
+  ~SetADT() { delete[] data; }
+
+  bool add(int element) {
+    if (contains(element)) return false;
+    ensureCapacity();
+    int pos = findInsertPosition(element);
+    for (int i = count; i > pos; --i) {
+      data[i] = data[i - 1];
+    }
+    data[pos] = element;
+    ++count;
+    return true;
+  }
+
+  bool remove(int element) {
+    int idx = binarySearch(element);
+    if (idx == -1) return false;
+    for (int i = idx; i < count - 1; ++i) {
+      data[i] = data[i + 1];
+    }
+    --count;
+    return true;
+  }
+
+  bool contains(int element) const { return binarySearch(element) != -1; }
+
+  int size() const { return count; }
+
+  SetIterator iterator() { return SetIterator(data, count); }
+
+  void display() const {
+    cout << "{ ";
+    for (int i = 0; i < count; ++i) {
+      cout << data[i] << " ";
+    }
+    cout << "}\n";
+  }
+
+  SetADT unionSet(const SetADT &other) const {
+    SetADT result(count + other.count + 2);
+    int i = 0, j = 0;
+    while (i < count && j < other.count) {
+      if (data[i] < other.data[j]) result.data[result.count++] = data[i++];
+      else if (data[i] > other.data[j]) result.data[result.count++] = other.data[j++];
+      else {
+        result.data[result.count++] = data[i];
+        ++i;
+        ++j;
+      }
+    }
+    while (i < count) result.data[result.count++] = data[i++];
+    while (j < other.count) result.data[result.count++] = other.data[j++];
+    return result;
+  }
+
+  SetADT intersection(const SetADT &other) const {
+    SetADT result((count < other.count ? count : other.count) + 2);
+    int i = 0, j = 0;
+    while (i < count && j < other.count) {
+      if (data[i] < other.data[j]) ++i;
+      else if (data[i] > other.data[j]) ++j;
+      else {
+        result.data[result.count++] = data[i];
+        ++i;
+        ++j;
+      }
+    }
+    return result;
+  }
+
+  SetADT difference(const SetADT &other) const {
+    SetADT result(count + 2);
+    int i = 0, j = 0;
+    while (i < count && j < other.count) {
+      if (data[i] < other.data[j]) result.data[result.count++] = data[i++];
+      else if (data[i] > other.data[j]) ++j;
+      else {
+        ++i;
+        ++j;
+      }
+    }
+    while (i < count) result.data[result.count++] = data[i++];
+    return result;
+  }
+
+  bool isSubsetOf(const SetADT &other) const {
+    int i = 0, j = 0;
+    while (i < count && j < other.count) {
+      if (data[i] < other.data[j]) return false;
+      if (data[i] > other.data[j]) ++j;
+      else {
+        ++i;
+        ++j;
+      }
+    }
+    return i == count;
+  }
+};
+
+void setMenu(SetADT &s, const string &name) {
+  while (true) {
+    cout << "\n"
+         << name << " Menu\n";
+    cout << "1. Add element\n";
+    cout << "2. Remove element\n";
+    cout << "3. Contains element\n";
+    cout << "4. Size\n";
+    cout << "5. Display\n";
+    cout << "6. Iterate\n";
+    cout << "7. Back\n";
+    cout << "Enter choice: ";
+
+    int choice;
+    cin >> choice;
+
+    if (choice == 1) {
+      int x;
+      cout << "Enter element: ";
+      cin >> x;
+      cout << (s.add(x) ? "Added\n" : "Duplicate element\n");
+    } else if (choice == 2) {
+      int x;
+      cout << "Enter element: ";
+      cin >> x;
+      cout << (s.remove(x) ? "Removed\n" : "Not found\n");
+    } else if (choice == 3) {
+      int x;
+      cout << "Enter element: ";
+      cin >> x;
+      cout << (s.contains(x) ? "Present\n" : "Absent\n");
+    } else if (choice == 4) {
+      cout << "Size: " << s.size() << "\n";
+    } else if (choice == 5) {
+      s.display();
+    } else if (choice == 6) {
+      SetIterator it = s.iterator();
+      cout << "Iterator output: ";
+      while (it.hasNext()) cout << it.next() << " ";
+      cout << "\n";
+    } else if (choice == 7) {
+      break;
+    } else {
+      cout << "Invalid choice\n";
+    }
+  }
+}
+
+int main() {
+  SetADT setA, setB;
+
+  while (true) {
+    cout << "\nMain Menu\n";
+    cout << "1. Operate on Set A\n";
+    cout << "2. Operate on Set B\n";
+    cout << "3. Union (A U B)\n";
+    cout << "4. Intersection (A n B)\n";
+    cout << "5. Difference (A - B)\n";
+    cout << "6. Difference (B - A)\n";
+    cout << "7. Is A subset of B?\n";
+    cout << "8. Display both sets\n";
+    cout << "9. Exit\n";
+    cout << "Enter choice: ";
+
+    int choice;
+    cin >> choice;
+
+    if (choice == 1) {
+      setMenu(setA, "Set A");
+    } else if (choice == 2) {
+      setMenu(setB, "Set B");
+    } else if (choice == 3) {
+      SetADT r = setA.unionSet(setB);
+      cout << "Union: ";
+      r.display();
+    } else if (choice == 4) {
+      SetADT r = setA.intersection(setB);
+      cout << "Intersection: ";
+      r.display();
+    } else if (choice == 5) {
+      SetADT r = setA.difference(setB);
+      cout << "Difference (A-B): ";
+      r.display();
+    } else if (choice == 6) {
+      SetADT r = setB.difference(setA);
+      cout << "Difference (B-A): ";
+      r.display();
+    } else if (choice == 7) {
+      if (setA.isSubsetOf(setB)) cout << "Set A is a subset of Set B\n";
+      else cout << "Set A is NOT a subset of Set B\n";
+    } else if (choice == 8) {
+      cout << "Set A: ";
+      setA.display();
+      cout << "Set B: ";
+      setB.display();
+    } else if (choice == 9) {
+      cout << "Exiting...\n";
+      break;
+    } else {
+      cout << "Invalid choice\n";
+    }
+  }
+
   return 0;
 }
