@@ -130,8 +130,8 @@ static bool insert(Node *&root, int key) {
     cout << "Attach as LEFT child of " << parent->key << "\n";
     cout << "Before: parent->lthread=T and parent->left(thread) points to predecessor "
          << (parent->left ? parent->left->key : -1) << "\n";
-    nn->left = parent->left; // predecessor
-    nn->right = parent;      // successor
+    nn->left = parent->left; // Predecessor
+    nn->right = parent;      // Successor
     parent->lthread = false;
     parent->left = nn;
     cout << "After: parent->lthread=C and parent->left(child)=" << nn->key << "\n";
@@ -141,8 +141,8 @@ static bool insert(Node *&root, int key) {
     cout << "Attach as RIGHT child of " << parent->key << "\n";
     cout << "Before: parent->rthread=T and parent->right(thread) points to successor "
          << (parent->right ? parent->right->key : -1) << "\n";
-    nn->left = parent;         // predecessor
-    nn->right = parent->right; // successor
+    nn->left = parent;         // Predecessor
+    nn->right = parent->right; // Successor
     parent->rthread = false;
     parent->right = nn;
     cout << "After: parent->rthread=C and parent->right(child)=" << nn->key << "\n";
@@ -172,7 +172,7 @@ static bool erase(Node *&root, int key) {
   }
   if (!found || !cur) return false;
 
-  // If node has two children: replace with inorder successor and delete successor.
+  // If node has two children: Replace with inorder successor and delete successor.
   if (!cur->lthread && !cur->rthread) {
     Node *ps = cur;
     Node *s = cur->right;
@@ -188,7 +188,7 @@ static bool erase(Node *&root, int key) {
   bool hasLeft = !cur->lthread;
   bool hasRight = !cur->rthread;
 
-  // Case: leaf
+  // Case: Leaf
   if (!hasLeft && !hasRight) {
     if (!parent) {
       delete root;
@@ -197,10 +197,10 @@ static bool erase(Node *&root, int key) {
     }
     if (parent->left == cur) {
       parent->lthread = true;
-      parent->left = cur->left; // predecessor thread
+      parent->left = cur->left; // Predecessor thread
     } else {
       parent->rthread = true;
-      parent->right = cur->right; // successor thread
+      parent->right = cur->right; // Successor thread
     }
     delete cur;
     return true;
@@ -210,7 +210,7 @@ static bool erase(Node *&root, int key) {
   Node *child = hasLeft ? cur->left : cur->right;
 
   if (hasLeft && !hasRight) {
-    // Fix threads: rightmost of left subtree should thread to cur->right (successor)
+    // Fix threads: Rightmost of left subtree should thread to cur->right (Successor)
     Node *pred = child;
     while (!pred->rthread) pred = pred->right;
     pred->right = cur->right;
@@ -219,7 +219,7 @@ static bool erase(Node *&root, int key) {
       if (succ->lthread) succ->left = pred;
     }
   } else if (!hasLeft && hasRight) {
-    // Fix threads: leftmost of right subtree should thread to cur->left (predecessor)
+    // Fix threads: Leftmost of right subtree should thread to cur->left (Predecessor)
     Node *succ = child;
     while (!succ->lthread) succ = succ->left;
     succ->left = cur->left;
@@ -267,7 +267,7 @@ static void dumpInorderWithThreads(Node *root) {
 }
 
 static void freeAll(Node *&root) {
-  // Delete by repeatedly erasing inorder nodes (safe with threads).
+  // Delete by repeatedly erasing inorder nodes
   Node *cur = root;
   if (!cur) return;
   while (!cur->lthread) cur = cur->left;
