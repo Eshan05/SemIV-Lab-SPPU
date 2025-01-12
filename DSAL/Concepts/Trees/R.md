@@ -2,7 +2,7 @@
 2. Tree with basic CRUD but also checking if leaf, height, depth, degree of node, siblings
 3. Binary tree, operations and array representation
 4. General tree to binary tree conversion
-5. Binary tree traversals : Recursive and iterative
+5. Binary tree traversals : Recursive and iterative of all types
 6. DFS and BFS : Recursive and iterative
 7. Huffman tree construction
 8. BST : Insertion, Deletion, Searching, Display
