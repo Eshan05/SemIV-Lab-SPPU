@@ -27,3 +27,4 @@
 27. Convert Binary Tree -> BST (structure preserved)
 28. Threaded Binary Tree : Preorder threading (BST <-> TBT conversion + traversal)
 29. Threaded Binary Tree : Postorder threading (BST <-> TBT conversion + traversal)
+20. Lowest Common Ancestor (LCA : Binary Lifting and Euler Tour + RMQ)
