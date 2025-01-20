@@ -24,3 +24,6 @@
 24. Segment / Fenwick (BIT) Tree : Construction, Sum and update queries, display
 25. Interval Tree : Construction, CRUD
 26. TREAPS (Tree + Heap) : Construction
+27. Convert Binary Tree -> BST (structure preserved)
+28. Threaded Binary Tree : Preorder threading (BST <-> TBT conversion + traversal)
+29. Threaded Binary Tree : Postorder threading (BST <-> TBT conversion + traversal)
