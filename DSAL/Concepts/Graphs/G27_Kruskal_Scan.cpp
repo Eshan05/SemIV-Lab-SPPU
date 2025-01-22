@@ -14,6 +14,7 @@ using namespace std;
 
 const int MAXV = 15;
 const int MAXE = 120;
+const int MAX_PATHS = 8;
 const int INF = 1000000;
 
 static int n = 0;
@@ -227,6 +228,60 @@ static int joinRoots(int ru, int rv) {
   return top;
 }
 
+static void printCyclePath(const vector<int> &keptIds, int from, int to,
+                           int w) {
+  vector<vector<int>> fadj(MAXV);
+  for (int k = 0; k < (int)keptIds.size(); k++) {
+    int id = keptIds[k];
+    fadj[aSide[id]].push_back(bSide[id]);
+    fadj[bSide[id]].push_back(aSide[id]);
+  }
+
+  vector<int> prev(MAXV, -1);
+  vector<bool> seen(MAXV, false);
+  vector<int> stack;
+  stack.push_back(from);
+  seen[from] = true;
+  while (!stack.empty()) {
+    int u = stack.back();
+    stack.pop_back();
+    if (u == to) break;
+    for (int i = 0; i < (int)fadj[u].size(); i++) {
+      int v = fadj[u][i];
+      if (seen[v]) continue;
+      seen[v] = true;
+      prev[v] = u;
+      stack.push_back(v);
+    }
+  }
+
+  vector<int> path;
+  int cur = to;
+  while (cur != from && cur != -1) {
+    path.push_back(cur);
+    cur = prev[cur];
+  }
+  path.push_back(from);
+
+  cout << "  Kept path";
+  for (int i = (int)path.size() - 1; i >= 0; i--) {
+    cout << (i == (int)path.size() - 1 ? " " : " - ") << path[i];
+  }
+  cout << ", and this edge closes it into a cycle.\n";
+
+  int heaviest = 0;
+  for (int i = (int)path.size() - 1; i > 0; i--) {
+    int a = path[i];
+    int b = path[i - 1];
+    if (wG[a][b] > heaviest) heaviest = wG[a][b];
+  }
+  cout << "  Those edges came earlier in the order, so none is heavier than "
+       << w << ".\n";
+  if (heaviest == w) {
+    cout << "  One of them ties at " << w << ", so some minimum tree uses this\n";
+    cout << "  edge and some other minimum tree does not.\n";
+  }
+}
 static void runKruskal() {
   if (n == 0) {
     cout << "Build the graph first.\n";
@@ -246,6 +301,7 @@ static void runKruskal() {
   vector<int> scanSizes;
   int kept = 0;
   int rejected = 0;
+  int pathsShown = 0;
   int examined = 0;
   int total = 0;
   int comparisons = 0;
@@ -286,7 +342,15 @@ static void runKruskal() {
     if (ru == rv) {
       rejected++;
       cout << "  Both ends answer to root " << ru
-           << " already, so reject it.\n";
+           << " already, so a kept path joins them.\n";
+      if (pathsShown < MAX_PATHS) {
+        printCyclePath(keptIds, u, v, wEdge[pick]);
+        pathsShown++;
+      } else if (pathsShown == MAX_PATHS) {
+        pathsShown++;
+        cout << "  Later rejections close cycles the same way, so only the\n";
+        cout << "  first " << MAX_PATHS << " paths are printed.\n";
+      }
       cout << "  Total stays " << total << ", edges still " << kept << " of "
            << (n - 1) << ".\n";
       continue;
@@ -333,6 +397,11 @@ static void runKruskal() {
     cout << "tree per piece.\n";
   }
 
+  cout << "\nEach rejection above was a cycle: A kept path already joined the two\n";
+  cout << "ends and nothing on it was heavier, which is the cycle property. The\n";
+  cout << "keeps can be proved with the cut property instead, but that needs the\n";
+  cout << "set of every edge left in the tree from this vertex, and the disjoint\n";
+  cout << "sets never print one.\n";
   cout << "\nRounds: " << round << ". Each round scanned the edges still unused:";
   for (int i = 0; i < (int)scanSizes.size(); i++) {
     cout << " " << scanSizes[i];

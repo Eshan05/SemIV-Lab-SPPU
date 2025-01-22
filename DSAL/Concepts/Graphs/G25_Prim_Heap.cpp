@@ -205,12 +205,24 @@ static void loadTieDemo() {
   cout << "Demo loaded: " << n << " vertices, " << edgeCount << " edges.\n";
 }
 
-static void printTreeMembers() {
-  cout << "  Tree:";
+static void printCutRow() {
+  cout << "  Cut    : {";
+  bool first = true;
   for (int v = 0; v < n; v++) {
-    if (inTree[v]) cout << " " << v;
+    if (!inTree[v]) continue;
+    if (!first) cout << " ";
+    cout << v;
+    first = false;
   }
-  cout << ".\n";
+  cout << "} | {";
+  first = true;
+  for (int v = 0; v < n; v++) {
+    if (inTree[v]) continue;
+    if (!first) cout << " ";
+    cout << v;
+    first = false;
+  }
+  cout << "}\n";
 }
 
 static void printHeap() {
@@ -274,13 +286,14 @@ static void runPrim() {
   int pops = 0;
 
   cout << "\n--- Prim from V" << start << " (Heap) ---\n";
-  cout << "Tree: " << start << ". Total weight 0.\n";
   inTree[start] = true;
   int treeSize = 1;
 
+  cout << "Total weight 0. The cut is the tree on the left and the rest on the\n";
+  cout << "right, and the heap always hands over its lightest edge.\n";
+  printCutRow();
   cout << "Push offers from V" << start << ":\n";
   pushOffers(start);
-  printTreeMembers();
 
   int step = 0;
   while (treeSize < n && !heapQ.empty()) {
@@ -312,12 +325,13 @@ static void runPrim() {
 
     cout << "  Pop V" << top.v << " at " << top.w << " through V" << top.from
          << ".\n";
-    cout << "  V" << top.v << " is outside the tree, so take it.\n";
+    cout << "  V" << top.v << " is outside the tree, so take it, the lightest\n";
+    cout << "  edge across the cut.\n";
     cout << "  Edge " << a << " - " << b << ", weight " << top.w
          << ". Total weight is " << total << ".\n";
     cout << "  Push offers from V" << top.v << ":\n";
     pushOffers(top.v);
-    printTreeMembers();
+    printCutRow();
   }
 
   cout << "\n--- Result ---\n";
@@ -344,6 +358,12 @@ static void runPrim() {
     cout << "spanning tree of that piece only, not of the whole graph.\n";
   }
 
+  cout << "\nEvery edge above was the lightest across the cut at the moment it was\n";
+  cout << "taken, and that is the whole argument: The lightest edge across any\n";
+  cout << "cut belongs to some minimum spanning tree. The heap does not change\n";
+  cout << "that, it only finds the same edge faster. Cycles can defend these\n";
+  cout << "edges too, but only by arguing about a tree this run never built, so\n";
+  cout << "the cut is the certificate actually in hand.\n";
   int levels = 0;
   int reach = 1;
   while (reach < pushesMade) {

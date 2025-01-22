@@ -207,12 +207,24 @@ static void printKeyRows() {
   cout << "\n";
 }
 
-static void printTreeMembers() {
-  cout << "  Tree:";
+static void printCutRow() {
+  cout << "  Cut    : {";
+  bool first = true;
   for (int v = 0; v < n; v++) {
-    if (inTree[v]) cout << " " << v;
+    if (!inTree[v]) continue;
+    if (!first) cout << " ";
+    cout << v;
+    first = false;
   }
-  cout << ".\n";
+  cout << "} | {";
+  first = true;
+  for (int v = 0; v < n; v++) {
+    if (inTree[v]) continue;
+    if (!first) cout << " ";
+    cout << v;
+    first = false;
+  }
+  cout << "}\n";
 }
 
 static void relaxFrom(int u) {
@@ -266,13 +278,14 @@ static void runPrim() {
   int total = 0;
 
   cout << "\n--- Prim from V" << start << " ---\n";
-  cout << "Tree: " << start << ". Total weight 0.\n";
   inTree[start] = true;
   int treeSize = 1;
 
+  cout << "Total weight 0. The cut is the tree on the left and the rest on the\n";
+  cout << "right, and every pass takes the lightest edge across it.\n";
+  printCutRow();
   cout << "Offers from V" << start << ":\n";
   relaxFrom(start);
-  printTreeMembers();
 
   int pass = 0;
   while (treeSize < n) {
@@ -297,6 +310,7 @@ static void runPrim() {
       cout << "  Key is the cheapest offer so far, and Parent is the vertex\n";
       cout << "  that made it. A tree vertex keeps the weight it entered with.\n";
     }
+    if (pass > 1) printCutRow();
 
     if ((int)tied.size() > 1) {
       cout << "  " << tied.size() << " vertices are tied at " << keyOf[best]
@@ -305,7 +319,7 @@ static void runPrim() {
 
     int from = parentOf[best];
     cout << "  Take V" << best << " at " << keyOf[best] << " through V" << from
-         << ".\n";
+         << ", the lightest edge across it.\n";
     inTree[best] = true;
     treeSize++;
     total += keyOf[best];
@@ -317,7 +331,6 @@ static void runPrim() {
          << ". Total weight is " << total << ".\n";
     cout << "  Offers from V" << best << ":\n";
     relaxFrom(best);
-    printTreeMembers();
   }
 
   cout << "\n--- Result ---\n";
@@ -344,6 +357,11 @@ static void runPrim() {
     cout << "spanning tree of that piece only, not of the whole graph.\n";
   }
 
+  cout << "\nEvery edge above was the lightest across the cut at the moment it was\n";
+  cout << "taken, and that is the whole argument: The lightest edge across any\n";
+  cout << "cut belongs to some minimum spanning tree. The same edges can be\n";
+  cout << "defended with cycles instead, but only by arguing about a tree this\n";
+  cout << "run never built, so the cut is the certificate actually in hand.\n";
   cout << "\nThe cut is scanned once per pass, so " << pass << " passes cost about "
        << pass * n << "\ncomparisons. A nearly complete graph has about V x V "
        << "edges, so this is\nthe shape to use there, and a sparse graph just "
